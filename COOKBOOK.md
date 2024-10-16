@@ -9,7 +9,7 @@ Primeiro é necessário definir a melhor forma de instalar o CEPH: Cephadm, Rook
 ## Instalação Manual
 [Instalação-Manual](https://docs.ceph.com/en/reef/install/index_manual/#install-manual)
 
-### 1ª Etapa
+### 1ª Etapa - Pegar os Softwares
 A primeira etapa é conseguir os pacotes necessários para a instalação do CEPH, o método mais comum é obter os pacotes adicionando repositórios para utilizá-los com ferramentas de gerenciamento de pacotes, como Advanced Package Tool (APT) ou Yellowdog Updater, Modified (YUM).
 [Get-Packages](https://docs.ceph.com/en/reef/install/get-packages/)
 
@@ -24,8 +24,11 @@ A primeira etapa é conseguir os pacotes necessários para a instalação do CEP
 
 
 
-### 2ª Etapa
+### 2ª Etapa - Instalar Softwares 
 
 
 
-### 3ª Etapa
+### 3ª Etapa - Deploy
+
+
+### 4ª Etapa - Eventuais Upgrades
