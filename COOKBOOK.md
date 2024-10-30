@@ -9,26 +9,17 @@ Primeiro é necessário definir a melhor forma de instalar o CEPH: Cephadm, Rook
 ## Instalação Manual
 [Instalação-Manual](https://docs.ceph.com/en/reef/install/index_manual/#install-manual)
 
-### 1ª Etapa - Pegar os Softwares
-A primeira etapa é conseguir os pacotes necessários para a instalação do CEPH, o método mais comum é obter os pacotes adicionando repositórios para utilizá-los com ferramentas de gerenciamento de pacotes, como Advanced Package Tool (APT) ou Yellowdog Updater, Modified (YUM).
-[Get-Packages](https://docs.ceph.com/en/reef/install/get-packages/)
+### 1ª Etapa - Pegar os Softwares e Instalar
+Para pegar os softwares manualmente, deveremos clonar o Source Code o CEPH e buildar ele.
+> ![image](https://github.com/user-attachments/assets/11d2099d-c88e-4462-8e2a-71c96a56c83d)
 
-> [!IMPORTANT]
-> Ele diz que é possível buildar o CEPH diretamente também para consegui os pacotes. Qual forma é melhor para conseguir os pacotes, a que eu mencionei em cima é possível?
-> Iremos Configurar os repositórios com os pacotes manualmente?
-> ![image](https://github.com/user-attachments/assets/378a17b4-b7cd-4509-a099-641e9b893aa9)
->
-> Ele menciona a necessidade de chaves, iremos adicionar essas chaves? Como iremos fazer isso?
-> ![image](https://github.com/user-attachments/assets/366e81bb-92b6-4d8a-babe-c4e1b0b97972)
+Após Isso será realizada a instalação
 
 
 
 
-### 2ª Etapa - Instalar Softwares 
+
+### 2ª Etapa - Deploy
 
 
-
-### 3ª Etapa - Deploy
-
-
-### 4ª Etapa - Eventuais Upgrades
+### 3ª Etapa - Eventuais Upgrades
