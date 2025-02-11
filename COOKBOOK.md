@@ -6,15 +6,12 @@ Primeiro é necessário definir a melhor forma de instalar o CEPH: Cephadm, Rook
 
 ------------------------------------------------------------------------------------------------------------------------------------
 
-## Instalação Manual
-[Instalação-Manual](https://docs.ceph.com/en/reef/install/index_manual/#install-manual)
+## Cephadm
+[cephadm]([https://docs.ceph.com/en/reef/install/index_manual/#install-manual](https://docs.ceph.com/en/quincy/cephadm/index.html))
 
-### 1ª Etapa - Pegar os Softwares e Instalar
-Para pegar os softwares manualmente, deveremos clonar o Source Code o CEPH e buildar ele.
-> ![image](https://github.com/user-attachments/assets/11d2099d-c88e-4462-8e2a-71c96a56c83d)
+A partir da versão Ceph Octopus (v15.2.17), foi introduzido a ferramenta cephadm, que foi construída especificamente para a instalação, manutenção e upgrade de clusters ceph. De acordo com Sebastian Wagner, ex membro do time de liderança do Ceph e desenvolvedor lead do projeto do cephadm, a ferramenta é a ferramenta preferida para implantar clusters Ceph que não são em Kubernetes. Com o lançamento do Ceph Octopus e do cephadm, as antigas formas de implantar o Ceph como ceph-ansible ou ceph-deploy foram descontinuadas.
 
-Após Isso será realizada a instalação
-
+### 1ª Etapa - Instalação do Cephadm em um dos hosts
 
 
 
