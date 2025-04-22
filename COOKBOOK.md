@@ -1,25 +1,53 @@
 # CookBook
 ## Documentação do [CEPH](https://docs.ceph.com/en/reef/)
 
-Primeiro é necessário definir a melhor forma de instalar o CEPH: Cephadm, Rook, Ceph-Ansible, ceph-deploy(não recebe mais suporte), ceph-salt, via juju, via puppet, OpenNebula HCI clusters ou manualmente.
-> Vale lembrar que nessa ocasião estamos implantando o CEPH em um cluster com 20 nós, então nesse caso iremos explorar a opção mais adequada.
+O CEPH é uma camada de software que possibilita provisionar clusters de armazenento distribuido sobre hardwares convencionais, dando acesso a file systems, Object Storage usando a API S3 e block storage em um ambiente escalavel e de alta disponibilidade. \
+A partir da versão Ceph Octopus (v15.2.17), foi introduzido a ferramenta cephadm, que foi construída especificamente para a instalação, manutenção e upgrade de clusters ceph. De acordo com Sebastian Wagner, ex membro do time de liderança do Ceph e desenvolvedor lead do projeto do cephadm, a ferramenta é a ferramenta preferida para implantar clusters Ceph que não são em Kubernetes. Com o lançamento do Ceph Octopus e do cephadm, as antigas formas de implantar o Ceph como ceph-ansible ou ceph-deploy foram descontinuadas.
 
 ------------------------------------------------------------------------------------------------------------------------------------
 
-## Instalação Manual
-[Instalação-Manual](https://docs.ceph.com/en/reef/install/index_manual/#install-manual)
+## Pré-instalação
 
-### 1ª Etapa - Pegar os Softwares e Instalar
-Para pegar os softwares manualmente, deveremos clonar o Source Code o CEPH e buildar ele.
-> ![image](https://github.com/user-attachments/assets/11d2099d-c88e-4462-8e2a-71c96a56c83d)
+Antes de realizar qualquer instalação do Ceph, é necessário verificar e, caso precise, corrigir os seguintes pontos em cada nó que será utilizado pelo Ceph:
+1. Verificar se a RAID está corretamente configurada e funcionando (Raid 5 ou 6, utilizando todos os HDs do nó)
+2. Verificar se a instalação do sistema operacional está funcionando (Rocky Linux 8 ou 9)
+3. Verificar se o proxy http e https estão corretamente configurados (Verificar com o professor o endereço e as credencials para a proxy)
+   
+## Instalação
 
-Após Isso será realizada a instalação
+### 1ª Etapa - Configurar ssh passwordless entre os nós para o usuário Root
+
+Em cada um dos nós que será utilizado no cluster, **como o usuário root**, gere um par de chaves que sera utilizado pelo ceph.
+```
+ssh-keygen
+```
+Então, utilize o comando `ssh-copy-id` para copiar a chave criada para cada outro nó no cluster.
+```
+ssh-copy-id root@<ip_do_nó> -i <caminho para a chave>
+```
+*Caso a chave criada não seja a padrão do comando `ssh-keygen`, ela deverá ser adicionada ao agente de ssh toda vez que o máquina é reiniciada, para fazer isso automaticamente, adicione o seguinte trecho ao arquivo `~/.bashrc`*
+```
+if [ -z "$SSH_AUTH_SOCK" ] ; then
+ eval `ssh-agent -s`
+ ssh-add <caminho para a chave>
+fi
+```
+
+### 2ª Etapa - Instalação das dependências do Cephadm
+
+O Cephadm provisiona os daemons do cluster ceph utilizando containers podman, então não é necessário instalar os pacotes manualmente do Ceph. Porém, ainda existem algumas dependências a serem instaladas em cada nó que será instalado o Cephadm. Elas são:
+- `Podman` ([Verifique a compatibilidade da versão do Podman e Ceph](https://docs.ceph.com/en/quincy/cephadm/compatibility/#cephadm-compatibility-with-podman))
+- `Python3`
+- `Chrony` ou outra ferramenta de sincronização de tempo
+- `Systemd`
+
+A dependência do `systemd` pode ser ignorada pois o Rocky Linux utilizado no EXADATA usa-o por padrão. Ademais, o `python3` também vem instalado por padrão no rocky linux. \
+Para instalar as depedências necessárias, execute o seguinte comando **como usuário root**:
+```
+dnf install -y podman chrony
+```
 
 
-
-
-
-### 2ª Etapa - Deploy
 
 
 ### 3ª Etapa - Eventuais Upgrades
