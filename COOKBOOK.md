@@ -35,19 +35,38 @@ fi
 
 ### 2ª Etapa - Instalação das dependências do Cephadm
 
-O Cephadm provisiona os daemons do cluster ceph utilizando containers podman, então não é necessário instalar os pacotes manualmente do Ceph. Porém, ainda existem algumas dependências a serem instaladas em cada nó que será instalado o Cephadm. Elas são:
+O Cephadm provisiona os daemons do cluster ceph utilizando containers podman, então não é necessário instalar os pacotes do Ceph manualmente. Porém, ainda existem algumas dependências a serem instaladas em cada nó que será instalado o Cephadm. Elas são:
 - `Podman` ([Verifique a compatibilidade da versão do Podman e Ceph](https://docs.ceph.com/en/quincy/cephadm/compatibility/#cephadm-compatibility-with-podman))
-- `Python3`
+- `Python >= 3.6`
 - `Chrony` ou outra ferramenta de sincronização de tempo
 - `Systemd`
 
-A dependência do `systemd` pode ser ignorada pois o Rocky Linux utilizado no EXADATA usa-o por padrão. Ademais, o `python3` também vem instalado por padrão no rocky linux. \
+A dependência do `systemd` pode ser ignorada pois o Rocky Linux utilizado no EXADATA usa-o por padrão.  \
 Para instalar as depedências necessárias, execute o seguinte comando **como usuário root**:
 ```
-dnf install -y podman chrony
+dnf install -y podman chrony python
 ```
 
+### 2ª Etapa - Instalação do Cephadm
 
+Para instalar o Cephadm, utilizaremos o curl para baixar o seu binário. \
+Atualmente, a versão do CEPH mais recente e ativa é a **Squid (19.2.2)**, portanto, utilizaremos ela para implantar o cluster
+```
+CEPH_RELEASE=19.2.2
+curl --silent --remote-name --location https://download.ceph.com/rpm-${CEPH_RELEASE}/el9/noarch/cephadm
+```
+Podemos verificar que o Cephadm foi instalado corretamente, podemos verificar a versão do Cephadm utilizando o seguinte comando:
+```
+# no diretorio que baixou o Cephadm
+./cephadm version
+```
+Se a versão é mostrada, o binário foi baixado corretamente. \
+Para simplificar a execução do Cephadm, vamos mover o binário para a pasta `/usr/sbin/`, eliminando a necessidade de passar o caminho inteiro quando precisamos executar. \
+**Execute o seguinte comando como usuário root**
+```
+# no diretorio que baixou o cephadm
+mv ./cephadm /usr/sbin/cephadm
+```
+Para facilitar a administração do Cluster CEPH, é interessante instalar o cephadm em cada nó que será utilizado pelo CEPH. Isto não é estritamente necessário, pois o CEPH será instalado em um nó independente se possui o Cephadm ou não, mas o Cephadm expoe a cli do CEPH, sendo possível administrar o cluster por qualquer nó.
 
-
-### 3ª Etapa - Eventuais Upgrades
+### 4ª Etapa - Bootstrap do Cluster CEPH  
