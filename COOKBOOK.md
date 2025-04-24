@@ -23,7 +23,7 @@ ssh-keygen
 ```
 Então, utilize o comando `ssh-copy-id` para copiar a chave criada para cada outro nó no cluster.
 ```
-ssh-copy-id root@<ip_do_nó> -i <caminho para a chave>
+ssh-copy-id -i <caminho para a chave> root@<ip_do_nó>
 ```
 *Caso a chave criada não seja a padrão do comando `ssh-keygen`, ela deverá ser adicionada ao agente de ssh toda vez que o máquina é reiniciada, para fazer isso automaticamente, adicione o seguinte trecho ao arquivo `~/.bashrc`*
 ```
