@@ -21,7 +21,7 @@ Em cada um dos nós que será utilizado no cluster, **como o usuário root**, ge
 ```
 ssh-keygen
 ```
-Então, utilize o comando `ssh-copy-id` para copiar a chave criada para cada outro nó no cluster.
+Então, utilize o comando `ssh-copy-id` para copiar a chave criada para cada nó no cluster, incluindo ele mesmo.
 ```
 ssh-copy-id -i <caminho para a chave> root@<ip_do_nó>
 ```
