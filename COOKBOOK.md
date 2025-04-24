@@ -71,3 +71,5 @@ mv ./cephadm /usr/sbin/cephadm
 Para facilitar a administração do Cluster CEPH, é interessante instalar o cephadm em cada nó que será utilizado pelo CEPH. Isto não é estritamente necessário, pois o CEPH será instalado em um nó independente se possui o Cephadm ou não, mas o Cephadm expoe a cli do CEPH, sendo possível administrar o cluster por qualquer nó.
 
 ### 4ª Etapa - Bootstrap do Cluster CEPH  
+
+Para iniciar o Cluster CEPH, devemos utilizar o bootstrap do Cephadmdn
