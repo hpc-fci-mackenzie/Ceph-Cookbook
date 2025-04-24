@@ -33,20 +33,6 @@ if [ -z "$SSH_AUTH_SOCK" ] ; then
 fi
 ```
 
-### 2ª Etapa - Instalação das dependências do Cephadm
-
-O Cephadm provisiona os daemons do cluster ceph utilizando containers podman, então não é necessário instalar os pacotes do Ceph manualmente. Porém, ainda existem algumas dependências a serem instaladas em cada nó que será instalado o Cephadm. Elas são:
-- `Podman` ([Verifique a compatibilidade da versão do Podman e Ceph](https://docs.ceph.com/en/quincy/cephadm/compatibility/#cephadm-compatibility-with-podman))
-- `Python >= 3.6`
-- `Chrony` ou outra ferramenta de sincronização de tempo
-- `Systemd`
-
-A dependência do `systemd` pode ser ignorada pois o Rocky Linux utilizado no EXADATA usa-o por padrão.  \
-Para instalar as depedências necessárias, execute o seguinte comando **como usuário root**:
-```
-dnf install -y podman chrony python
-```
-
 ### 2ª Etapa - Instalação do Cephadm
 
 Para instalar o Cephadm, utilizaremos o curl para baixar o seu binário. \
