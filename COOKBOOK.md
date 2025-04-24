@@ -55,9 +55,10 @@ Atualmente, a versão do CEPH mais recente e ativa é a **Squid (19.2.2)**, port
 CEPH_RELEASE=19.2.2
 curl --silent --remote-name --location https://download.ceph.com/rpm-${CEPH_RELEASE}/el9/noarch/cephadm
 ```
-Podemos verificar que o Cephadm foi instalado corretamente, podemos verificar a versão do Cephadm utilizando o seguinte comando:
+Para verificar que o Cephadm foi instalado corretamente, podemos deixar o binário executavel e verificar a versão do Cephadm utilizando o seguinte comando:
 ```
 # no diretorio que baixou o Cephadm
+chmod +x ./cephadm
 ./cephadm version
 ```
 Se a versão é mostrada, o binário foi baixado corretamente. \
