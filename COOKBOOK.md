@@ -68,19 +68,30 @@ Este comando inicia o cluster com 1 nó e coloca o primeiro [**mon**](https://do
 Para fazer o bootstrap do cluster no nó que está executando o cephadm, **execute o seguinte comando como root**:
 Os argumentos devem ser preenchidos da seguinte forma:
 1. ip-privado-do-nó -> O IP privado na rede do exadata do nó que está rodando o comando. **É importante não utilizar localhost ou 127.0.0.1 neste parametro**
-2. CIDR da rede dos OSDs -> O segmento de rede que será utilizado pelos OSDs. Atualmente está sendo utilizado 172.16.0.0/16
+2. CIDR da rede dos OSDs -> O segmento de rede que será utilizado pelos OSDs. Atualmente está sendo utilizado 10.0.0.0/24
 3. nome do cluster -> Nome do cluster. Atualmente é exadata-ceph
 ```
-cephadm bootstrap --mon-ip= <ip-privado-do-nó> --cluster-network=<CIDR da rede dos OSDs> --cluster-name <nome do cluster>
+cephadm bootstrap --mon-ip= <ip-privado-do-nó> --cluster-network=<CIDR da rede dos OSDs>
 ```
 Este comando irá demorar um tempo para executar.
 
-### 5ª Etapa - Adicionando os nós restantes no Cluster
+### 5ª Etapa - Instalando a CLI do Ceph no node
+
+Para facilitar o uso do CEPH, podemos instalar a CLI do ceph e outros pacotes para administracao e uso do cluster diretamente no no. Para fazer isso, **execute os seguintes comandos como root**:
+```
+cephadm add-repo --release quincy
+cephadm install ceph-common
+```
+### 6ª Etapa - Adicionando os nós restantes no Cluster
 
 Agora, para adicionar os nós restantes no cluster, deve se copiar as chaves SSH do ceph para os nós
 ```
 ssh-copy-id -f -i /etc/ceph/ceph.pub root@<novo nó>
 ```
+Então, execute o seguinte comando para adicionar um host novo e adicionar o label `_admin` para a utilizacao do cephadm:
+```
+ceph orch host add <hostname do no> <ip do no> _admin 
+```
+Faca isso para todo no que sera adicionado ao cluster.
 
-Então
-
+### 7ª Etapa - Adicionando OSDs para os dispostivos de armazenamento
