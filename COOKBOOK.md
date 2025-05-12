@@ -78,5 +78,9 @@ Este comando irá demorar um tempo para executar.
 ### 5ª Etapa - Adicionando os nós restantes no Cluster
 
 Agora, para adicionar os nós restantes no cluster, deve se copiar as chaves SSH do ceph para os nós
+```
+ssh-copy-id -f -i /etc/ceph/ceph.pub root@<novo nó>
+```
 
+Então
 
