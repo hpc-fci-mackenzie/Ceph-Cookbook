@@ -1,7 +1,12 @@
-# CookBook
+# CEPH Cookbook
+## O Exadata
+
+O Oracle Exadata é um Rack de 20 nós localizado na Faculdade De Computação e Informática (FCI) da Universidade Presbiteriana Mackenzie. Ele foi adpatado do seu uso original, que é hospedar bancos de dados oracle, para um rack general-purpose utilizado pela FCI para estudo e apoio. \
+A FCI possuí vários departamentos e grupos de estudo que se benificiariam de um sistema de arquivos distribuido e exposto pela rede (algo como um NAS) para que arquivos sejam disponibilizados automaticamente. Para tal, foi proposto implantar um cluster CEPH em certos nós do exadata para prover esse sistema de arquivos.
+
 ## Documentação do [CEPH](https://docs.ceph.com/en/reef/)
 
-O CEPH é uma camada de software que possibilita provisionar clusters de armazenento distribuido sobre hardwares convencionais, dando acesso a file systems, Object Storage usando a API S3 e block storage em um ambiente escalavel e de alta disponibilidade. \
+O CEPH é uma camada de software que possibilita provisionar clusters de armazenento distribuido sobre hardwares convencionais, dando acesso a file systems NAS, Object Storage usando a API S3 e block storage em um ambiente escalavel e de alta disponibilidade. \
 A partir da versão Ceph Octopus (v15.2.17), foi introduzido a ferramenta cephadm, que foi construída especificamente para a instalação, manutenção e upgrade de clusters ceph. De acordo com Sebastian Wagner, ex membro do time de liderança do Ceph e desenvolvedor lead do projeto do cephadm, a ferramenta é a ferramenta preferida para implantar clusters Ceph que não são em Kubernetes. Com o lançamento do Ceph Octopus e do cephadm, as antigas formas de implantar o Ceph como ceph-ansible ou ceph-deploy foram descontinuadas.
 
 ------------------------------------------------------------------------------------------------------------------------------------
@@ -9,9 +14,9 @@ A partir da versão Ceph Octopus (v15.2.17), foi introduzido a ferramenta cephad
 ## Pré-instalação
 
 Antes de realizar qualquer instalação do Ceph, é necessário verificar e, caso precise, corrigir os seguintes pontos em cada nó que será utilizado pelo Ceph:
-1. Verificar se a RAID está corretamente configurada e funcionando (Raid 5 ou 6, utilizando todos os HDs do nó)
-2. Verificar se a instalação do sistema operacional está funcionando (Rocky Linux 8 ou 9)
-3. Verificar se o proxy http e https estão corretamente configurados (Verificar com o professor o endereço e as credencials para a proxy)
+1. Verificar se a RAID está corretamente configurada e funcionando. (**Devido a necessidade do CEPH de um dispositivo de armazenamento sem sistema de arquivo, é necessário criar dois volumes RAIDs, um para o SO e um para o CEPH**)
+3. Verificar se a instalação do sistema operacional está funcionando (Rocky Linux 8 ou 9)
+4. Verificar se o proxy http e https estão corretamente configurados (Verificar com o professor o endereço e as credencials para a proxy)
    
 ## Instalação
 
@@ -58,4 +63,20 @@ Para facilitar a administração do Cluster CEPH, é interessante instalar o cep
 
 ### 4ª Etapa - Bootstrap do Cluster CEPH  
 
-Para iniciar o Cluster CEPH, devemos utilizar o bootstrap do Cephadmdn
+Para iniciar o Cluster CEPH, devemos utilizar o bootstrap do Cephadmdn. \
+Este comando inicia o cluster com 1 nó e coloca o primeiro [**mon**](https://docs.ceph.com/en/latest/cephadm/services/mon/) deamon neste nó. \
+Para fazer o bootstrap do cluster no nó que está executando o cephadm, **execute o seguinte comando como root**:
+Os argumentos devem ser preenchidos da seguinte forma:
+1. ip-privado-do-nó -> O IP privado na rede do exadata do nó que está rodando o comando. **É importante não utilizar localhost ou 127.0.0.1 neste parametro**
+2. CIDR da rede dos OSDs -> O segmento de rede que será utilizado pelos OSDs. Atualmente está sendo utilizado 172.16.0.0/16
+3. nome do cluster -> Nome do cluster. Atualmente é exadata-ceph
+```
+cephadm bootstrap --mon-ip= <ip-privado-do-nó> --cluster-network=<CIDR da rede dos OSDs> --cluster-name <nome do cluster>
+```
+Este comando irá demorar um tempo para executar.
+
+### 5ª Etapa - Adicionando os nós restantes no Cluster
+
+Agora, para adicionar os nós restantes no cluster, deve se copiar as chaves SSH do ceph para os nós
+
+
