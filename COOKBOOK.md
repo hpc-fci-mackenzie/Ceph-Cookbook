@@ -234,18 +234,21 @@ Exemplo:
 ceph orch apply mds cephfs-fci --placement='2'
 ```
 
+
 ### 8.3 - Instalar e Ativar o NFS Ganesha
 
 Para exportar o CephFS por NFS:
 
 ```bash
-ceph orch apply nfs <nome-da-instancia-nfs> --port 2049 --placement='<número de nós>'
+ceph nfs cluster create <nome-da-instancia-nfs> '1 headnode.exadata'
 ```
 
+Já que queremos que o sistema de arquivos seja disponibilizado no headnode, adicionamos a string `1 headnode.exadata` para dizer ao ceph que queremos 1 deamon nfs ganesha no nó headnode
+ 
 Exemplo:
 
 ```bash
-ceph orch apply nfs nfs-fci --port 2049 --placement='2'
+ceph nfs cluster create nfs-fci '1 headnode.exadata'
 ```
 
 Verifique se o serviço está ativo:
@@ -265,10 +268,18 @@ ceph nfs export create cephfs <nome-da-instancia-nfs> /<export-path> <nome_do_fi
 Exemplo:
 
 ```bash
-ceph nfs export create cephfs nfs-fci / fci-cephfs
+ceph nfs export create cephfs nfs-fci /<caminho> fci-cephfs
 ```
 
-Isso cria um ponto de montagem NFS `/` vinculado ao CephFS `fci-cephfs`.
+Exemplo:
+
+```bash
+ceph nfs export create cephfs nfs-fci /nfs cephfs-fci
+```
+
+Isso cria um ponto de montagem NFS `/nfs` vinculado ao CephFS `cephfs-fci`.
+
+**OBS:** não é possivel criar um export com o caminho `/`
 
 Você pode listar os exports com:
 
@@ -281,14 +292,16 @@ ceph nfs export ls nfs-fci
 Nos clientes Linux, monte o volume NFS normalmente:
 
 ```bash
-sudo mount -t nfs <ip_do_nó_nfs>:/ /mnt/cephfs
+sudo mount -t nfs <ip_do_nó_nfs>:/<caminho> /mnt/cephfs
 ```
 
 Adicione no `/etc/fstab` para montagem automática:
 
 ```bash
-<ip_do_nó_nfs>:/ /mnt/cephfs nfs defaults,_netdev 0 0
+<ip_do_nó_nfs>:/<caminho> /mnt/cephfs nfs defaults,_netdev 0 0
 ```
+
+**Observação**: Caso execute o comando `df` no sistema de arquivos montado, você pode estranhar que o tamanho é menor do que o esperado, isso é normal. O Ceph possui um sistema de *autoscaling* para *pools* que aumenta o tamanho do sistema de arquivo automaticamente até um máximo
 
 ### Observações
 
@@ -319,7 +332,6 @@ ceph osd pool set-quota max_bytes cephfs-fci_metadata 107374182400
 ```
 
 **Observação**: O valor dado ao comando é em **bytes**, então, por exemplo, 100GiB se torna 107374182400
-
 
 ## Conclusão
 
