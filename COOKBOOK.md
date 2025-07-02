@@ -159,7 +159,7 @@ Este comando inicia o cluster com 1 nó como monitor principal (MON):
 cephadm bootstrap \
   --mon-ip=<ip_privado> \
   --cluster-network=10.0.0.0/24 \
-  --cluster-name=exadata-ceph
+  --allow-fqdn-hostname
 ```
 
 **Importante**: Use o IP da rede interna (do Exadata), nunca `localhost`.
