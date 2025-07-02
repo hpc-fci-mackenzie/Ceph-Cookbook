@@ -102,28 +102,15 @@ As seguintes portas devem ser liberadas para o acesso ao NFS no headnode:
 
 ## Capítulo 3 - Configuração Inicial
 
-### 3.1 - SSH Passwordless entre os Nós
+### 3.1 - dependências
 
-Em **todos os nós**:
+As seguintes são as dependências da ferramenta Cephadm
 
-```bash
-ssh-keygen
-```
-
-Depois:
-
-```bash
-ssh-copy-id -i ~/.ssh/id_rsa.pub root@<ip_do_nó>
-```
-
-Se a chave não for a padrão, adicione ao `~/.bashrc`:
-
-```bash
-if [ -z "$SSH_AUTH_SOCK" ]; then
-  eval `ssh-agent -s`
-  ssh-add <caminho_para_chave>
-fi
-```
+- Python 3
+- Systemd
+- Podman
+- Chronyd
+- LVM2
 
 ---
 
@@ -158,7 +145,6 @@ Este comando inicia o cluster com 1 nó como monitor principal (MON):
 ```bash
 cephadm bootstrap \
   --mon-ip=<ip_privado> \
-  --cluster-network=10.0.0.0/24 \
   --allow-fqdn-hostname
 ```
 
@@ -166,28 +152,26 @@ cephadm bootstrap \
 
 ---
 
-## Capítulo 6 - Instalando a CLI do Ceph
+## Capítulo 6 - Adicionando Mais Nós
 
-Para facilitar o gerenciamento via linha de comando:
+### 6.1 - Compartilhar Chave SSH do ceph
 
-```bash
-cephadm add-repo --release squid
-cephadm install ceph-common
-```
-
----
-
-## Capítulo 7 - Adicionando Mais Nós
-
-### 7.1 - Compartilhar Chave SSH
-
-Execute no nó onde o cluster foi iniciado:
+Como não temos como utilizar o `ssh-copy-id` para o usuário root, precisamos manualmente copiar a chave pública do CEPH e a adicionar como chave autorizada nos nós. \
+Em um dos nós do cluster, copie o conteúdo do seguinte arquivo:
 
 ```bash
-ssh-copy-id -f -i /etc/ceph/ceph.pub root@<ip_do_novo_nó>
+/etc/ceph/ceph.pub
 ```
 
-### 7.2 - Adicionar o Nó ao Cluster
+então, no nó que deseja adicionar ao cluster, adicione o conteúdo deste arquivo ào final do seguinte arquivo:
+
+```bash
+/root/.ssh/authorized_keys
+```
+
+isso irá habilitar que o ceph consiga se conectar ao nó desejado
+
+### 6.2 - Adicionar o Nó ao Cluster
 
 ```bash
 ceph orch host add <hostname> <ip> _admin
@@ -197,7 +181,7 @@ Repita o processo para todos os nós.
 
 ---
 
-## Capítulo 8 - Provisionando OSDs
+## Capítulo 7 - Provisionando OSDs
 
 O OSD (Object Storage Daemon) é o componente que gerencia o armazenamento bruto. Para adicioná-los:
 
@@ -207,11 +191,11 @@ ceph orch apply osd --all-available-devices
 
 Este comando detecta os discos sem partição nem filesystem e os configura automaticamente.
 
-## Capítulo 9 - Criando um CephFS e Expondo via NFS com Ganesha
+## Capítulo 8 - Criando um CephFS e Expondo via NFS com Ganesha
 
 O CephFS é o sistema de arquivos nativo do CEPH, que permite criar volumes compartilhados com semântica POSIX, similar a sistemas como NFS ou ext4. Para disponibilizá-lo em uma rede de forma compatível com clientes NFS, é necessário configurar o **NFS Ganesha** sobre o Ceph.
 
-### 9.1 - Criar o Pool e o Filesystem CephFS
+### 8.1 - Criar o Pool e o Filesystem CephFS
 
 Execute os comandos abaixo no nó com a CLI do Ceph instalada:
 
@@ -236,7 +220,7 @@ Verifique a criação com:
 ceph fs ls
 ```
 
-### 9.2 - Implantar o Daemon MDS
+### 8.2 - Implantar o Daemon MDS
 
 Se ainda não existir, adicione um daemon **MDS** (Metadata Server), necessário para o funcionamento do CephFS:
 
@@ -250,7 +234,7 @@ Exemplo:
 ceph orch apply mds cephfs-fci --placement='2'
 ```
 
-### 9.3 - Instalar e Ativar o NFS Ganesha
+### 8.3 - Instalar e Ativar o NFS Ganesha
 
 Para exportar o CephFS por NFS:
 
@@ -270,7 +254,7 @@ Verifique se o serviço está ativo:
 ceph orch ps | grep nfs
 ```
 
-### 9.4 - Criar a Exportação NFS
+### 8.4 - Criar a Exportação NFS
 
 Crie um export para o CephFS com o seguinte comando:
 
@@ -292,7 +276,7 @@ Você pode listar os exports com:
 ceph nfs export ls nfs-fci
 ```
 
-### 9.5 - Montando o NFS em Clientes
+### 8.5 - Montando o NFS em Clientes
 
 Nos clientes Linux, monte o volume NFS normalmente:
 
@@ -312,13 +296,13 @@ Adicione no `/etc/fstab` para montagem automática:
 * Certifique-se que as portas 2049 e 111 estejam liberadas entre os clientes e os nós que rodam o Ganesha.
 * Para segurança, configure regras de exportação usando arquivos de export ou políticas via `ceph nfs export`.
 
-## Cápitulo 10 - Limitando o tamanho do File System
+## Cápitulo 9 - Limitando o tamanho do File System
 
 É comum que o tamanho do file system criado pelo CephFS tenha um tamanho máximo. Para fazer isso, temos a seguinte abordagem:
 
 - Limitar o file system inteiro (Dar um tamanho máximo para a *pool* utilizada pelo file system)
 
-### 10.1 - Limitando o file system inteiro
+### 9.1 - Limitando o file system inteiro
 
 Para limitar o tamanho do file system inteiro, é necessário limitar as duas pools utilizadas pelo CephFS:
 
